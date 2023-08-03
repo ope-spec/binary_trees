@@ -1,86 +1,35 @@
 #include "binary_trees.h"
+#include "queue.h"
 
 /**
- * binary_tree_levelorder - Traverse a binary tree using level-order traversal
+ * binary_tree_levelorder - Performs a level-order traversal on a binary tree
  *
  * @tree: Pointer to the root node of the tree to traverse
  * @func: Pointer to a function to call for each node
  */
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 {
-	if (tree == NULL || func == NULL)
-		return;
+    if (tree == NULL || func == NULL)
+        return;
 
-	queue_t *queue = NULL;
-	const binary_tree_t *current;
+    queue_t *queue = queue_create();
 
-	queue = queue_push(queue, tree);
-	while (queue)
-	{
-		current = queue->node;
-		queue = queue_pop(queue);
-		func(current->n);
+    if (queue == NULL)
+        return;
 
-		if (current->left)
-			queue = queue_push(queue, current->left);
-		if (current->right)
-			queue = queue_push(queue, current->right);
-	}
+    enqueue(queue, (void *)tree);
 
-	/* Free the queue */
-	while (queue)
-	{
-		queue_t *temp = queue;
-		queue = queue->next;
-		free(temp);
-	}
-}
+    while (!queue_is_empty(queue))
+    {
+        binary_tree_t *current = (binary_tree_t *)dequeue(queue);
+        func(current->n);
 
-/**
- * queue_push - Push a node to the queue
- *
- * @queue: Pointer to the front of the queue
- * @node: Pointer to the node to be pushed
- *
- * Return: Pointer to the front of the updated queue
- */
-queue_t *queue_push(queue_t *queue, const binary_tree_t *node)
-{
-	queue_t *new_node, *last;
+        if (current->left != NULL)
+            enqueue(queue, (void *)current->left);
 
-	new_node = malloc(sizeof(queue_t));
-	if (new_node == NULL)
-		return (NULL);
+        if (current->right != NULL)
+            enqueue(queue, (void *)current->right);
+    }
 
-	new_node->node = node;
-	new_node->next = NULL;
-
-	if (queue == NULL)
-		return (new_node);
-
-	last = queue;
-	while (last->next)
-		last = last->next;
-
-	last->next = new_node;
-	return (queue);
-}
-
-/**
- * queue_pop - Pop a node from the queue
- *
- * @queue: Pointer to the front of the queue
- *
- * Return: Pointer to the front of the updated queue
- */
-queue_t *queue_pop(queue_t *queue)
-{
-	queue_t *temp;
-
-	if (queue == NULL)
-		return (NULL);
-
-	temp = queue->next;
-	free(queue);
-	return (temp);
+    queue_delete(queue);
 }
