@@ -42,10 +42,10 @@ binary_tree_t *binary_trees_ancestor(
 	size_t a_depth, b_depth;
 
 	if (!a || !b)
-		return NULL;
+		return (NULL);
 
 	if (a == b)
-		return (binary_tree_t *)a;
+		return ((binary_tree_t *)a);
 
 	a_depth = binary_tree_depth(a);
 	b_depth = binary_tree_depth(b);
@@ -68,5 +68,5 @@ binary_tree_t *binary_trees_ancestor(
 		b = b->parent;
 	}
 
-	return (binary_tree_t *)a;
+	return ((binary_tree_t *)a);
 }
