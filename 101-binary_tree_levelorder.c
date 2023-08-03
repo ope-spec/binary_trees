@@ -1,54 +1,4 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "binary_trees.h"
-
-/**
- * binary_tree_enqueue - Enqueue a binary tree node into a queue
- *
- * @queue: Pointer to the queue
- * @node: Pointer to the node to enqueue
- */
-void binary_tree_enqueue(binary_tree_t **queue, const binary_tree_t *node)
-{
-	binary_tree_t *new_node = binary_tree_node(NULL, 0);
-
-	if (!new_node)
-		return;
-
-	new_node->left = (binary_tree_t *)node;
-	new_node->right = *queue;
-
-	*queue = new_node;
-}
-
-/**
- * binary_tree_dequeue - Dequeue a binary tree node from a queue
- *
- * @queue: Pointer to the queue
- *
- * Return: Pointer to the dequeued node
- */
-binary_tree_t *binary_tree_dequeue(binary_tree_t **queue)
-{
-	binary_tree_t *current = *queue;
-	binary_tree_t *prev = NULL;
-
-	if (!queue || !*queue)
-		return (NULL);
-
-	while (current->right)
-	{
-		prev = current;
-		current = current->right;
-	}
-
-	if (prev)
-		prev->right = NULL;
-	else
-		*queue = NULL;
-
-	return (current->left);
-}
 
 /**
  * binary_tree_levelorder - Traverse a binary tree using level-order traversal
@@ -58,23 +8,79 @@ binary_tree_t *binary_tree_dequeue(binary_tree_t **queue)
  */
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int))
 {
-	binary_tree_t *queue = NULL;
-	const binary_tree_t *current = tree;
-
-	if (!tree || !func)
+	if (tree == NULL || func == NULL)
 		return;
 
-	binary_tree_enqueue(&queue, current);
+	queue_t *queue = NULL;
+	const binary_tree_t *current;
 
+	queue = queue_push(queue, tree);
 	while (queue)
 	{
-		current = binary_tree_dequeue(&queue);
+		current = queue->node;
+		queue = queue_pop(queue);
 		func(current->n);
 
 		if (current->left)
-			binary_tree_enqueue(&queue, current->left);
-
+			queue = queue_push(queue, current->left);
 		if (current->right)
-			binary_tree_enqueue(&queue, current->right);
+			queue = queue_push(queue, current->right);
 	}
+
+	/* Free the queue */
+	while (queue)
+	{
+		queue_t *temp = queue;
+		queue = queue->next;
+		free(temp);
+	}
+}
+
+/**
+ * queue_push - Push a node to the queue
+ *
+ * @queue: Pointer to the front of the queue
+ * @node: Pointer to the node to be pushed
+ *
+ * Return: Pointer to the front of the updated queue
+ */
+queue_t *queue_push(queue_t *queue, const binary_tree_t *node)
+{
+	queue_t *new_node, *last;
+
+	new_node = malloc(sizeof(queue_t));
+	if (new_node == NULL)
+		return (NULL);
+
+	new_node->node = node;
+	new_node->next = NULL;
+
+	if (queue == NULL)
+		return (new_node);
+
+	last = queue;
+	while (last->next)
+		last = last->next;
+
+	last->next = new_node;
+	return (queue);
+}
+
+/**
+ * queue_pop - Pop a node from the queue
+ *
+ * @queue: Pointer to the front of the queue
+ *
+ * Return: Pointer to the front of the updated queue
+ */
+queue_t *queue_pop(queue_t *queue)
+{
+	queue_t *temp;
+
+	if (queue == NULL)
+		return (NULL);
+
+	temp = queue->next;
+	free(queue);
+	return (temp);
 }

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <string.h>
 
 /**
  * struct binary_tree_s - Binary tree node
@@ -25,6 +27,7 @@ void binary_tree_print(const binary_tree_t *);
 typedef struct binary_tree_s bst_t;
 typedef struct binary_tree_s avl_t;
 typedef struct binary_tree_s heap_t;
+
 
 /*  PROTOTYPES  */
 binary_tree_t *binary_tree_node(binary_tree_t *parent, int value);
@@ -48,8 +51,16 @@ binary_tree_t *binary_tree_sibling(binary_tree_t *node);
 binary_tree_t *binary_tree_uncle(binary_tree_t *node);
 
 /*--------ADVANCED TASKS----------------------*/
+typedef struct queue_s
+{
+	const binary_tree_t *node;
+	struct queue_s *next;
+} queue_t;
+
 binary_tree_t *binary_trees_ancestor(const binary_tree_t *first,
 						const binary_tree_t *second);
 void binary_tree_levelorder(const binary_tree_t *tree, void (*func)(int));
+queue_t *queue_push(queue_t *queue, const binary_tree_t *node);
+queue_t *queue_pop(queue_t *queue);
 
 #endif /* _BINARY_TREES_H_ */
